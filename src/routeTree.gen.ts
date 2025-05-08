@@ -11,13 +11,43 @@
 // Import Routes
 
 import { Route as rootRoute } from './routes/__root'
+import { Route as PostsImport } from './routes/posts'
+import { Route as LoginImport } from './routes/login'
+import { Route as HomeImport } from './routes/home'
 import { Route as IndexImport } from './routes/index'
+import { Route as PostsNewImport } from './routes/posts.new'
+import { Route as PostsIdImport } from './routes/posts.$id'
 
 // Create/Update Routes
+
+const PostsRoute = PostsImport.update({
+  path: '/posts',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const LoginRoute = LoginImport.update({
+  path: '/login',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const HomeRoute = HomeImport.update({
+  path: '/home',
+  getParentRoute: () => rootRoute,
+} as any)
 
 const IndexRoute = IndexImport.update({
   path: '/',
   getParentRoute: () => rootRoute,
+} as any)
+
+const PostsNewRoute = PostsNewImport.update({
+  path: '/new',
+  getParentRoute: () => PostsRoute,
+} as any)
+
+const PostsIdRoute = PostsIdImport.update({
+  path: '/$id',
+  getParentRoute: () => PostsRoute,
 } as any)
 
 // Populate the FileRoutesByPath interface
@@ -31,12 +61,52 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexImport
       parentRoute: typeof rootRoute
     }
+    '/home': {
+      id: '/home'
+      path: '/home'
+      fullPath: '/home'
+      preLoaderRoute: typeof HomeImport
+      parentRoute: typeof rootRoute
+    }
+    '/login': {
+      id: '/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof LoginImport
+      parentRoute: typeof rootRoute
+    }
+    '/posts': {
+      id: '/posts'
+      path: '/posts'
+      fullPath: '/posts'
+      preLoaderRoute: typeof PostsImport
+      parentRoute: typeof rootRoute
+    }
+    '/posts/$id': {
+      id: '/posts/$id'
+      path: '/$id'
+      fullPath: '/posts/$id'
+      preLoaderRoute: typeof PostsIdImport
+      parentRoute: typeof PostsImport
+    }
+    '/posts/new': {
+      id: '/posts/new'
+      path: '/new'
+      fullPath: '/posts/new'
+      preLoaderRoute: typeof PostsNewImport
+      parentRoute: typeof PostsImport
+    }
   }
 }
 
 // Create and export the route tree
 
-export const routeTree = rootRoute.addChildren({ IndexRoute })
+export const routeTree = rootRoute.addChildren({
+  IndexRoute,
+  HomeRoute,
+  LoginRoute,
+  PostsRoute: PostsRoute.addChildren({ PostsIdRoute, PostsNewRoute }),
+})
 
 /* prettier-ignore-end */
 
@@ -46,11 +116,35 @@ export const routeTree = rootRoute.addChildren({ IndexRoute })
     "__root__": {
       "filePath": "__root.ts",
       "children": [
-        "/"
+        "/",
+        "/home",
+        "/login",
+        "/posts"
       ]
     },
     "/": {
       "filePath": "index.ts"
+    },
+    "/home": {
+      "filePath": "home.ts"
+    },
+    "/login": {
+      "filePath": "login.ts"
+    },
+    "/posts": {
+      "filePath": "posts.ts",
+      "children": [
+        "/posts/$id",
+        "/posts/new"
+      ]
+    },
+    "/posts/$id": {
+      "filePath": "posts.$id.ts",
+      "parent": "/posts"
+    },
+    "/posts/new": {
+      "filePath": "posts.new.ts",
+      "parent": "/posts"
     }
   }
 }
